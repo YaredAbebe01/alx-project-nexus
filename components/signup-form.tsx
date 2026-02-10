@@ -21,6 +21,8 @@ export function SignupForm() {
     password: '',
     confirmPassword: '',
   })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -68,7 +70,7 @@ export function SignupForm() {
         <Input
           id="name"
           name="name"
-          placeholder="John Doe"
+          placeholder="Jhon Doe"
           value={formData.name}
           onChange={handleChange}
           disabled={isLoading}
@@ -82,7 +84,7 @@ export function SignupForm() {
           id="email"
           name="email"
           type="email"
-          placeholder="you@example.com"
+          placeholder="yourEmail@gmail.com"
           value={formData.email}
           onChange={handleChange}
           disabled={isLoading}
@@ -95,7 +97,7 @@ export function SignupForm() {
         <Input
           id="phone"
           name="phone"
-          placeholder="+1 (555) 123-4567"
+          placeholder="+2519000000"
           value={formData.phone}
           onChange={handleChange}
           disabled={isLoading}
@@ -105,30 +107,48 @@ export function SignupForm() {
 
       <div className="space-y-2">
         <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          placeholder="Enter your password"
-          value={formData.password}
-          onChange={handleChange}
-          disabled={isLoading}
-          className="bg-input"
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Enter your password"
+            value={formData.password}
+            onChange={handleChange}
+            disabled={isLoading}
+            className="bg-input pr-16"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(prev => !prev)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+        </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
-        <Input
-          id="confirmPassword"
-          name="confirmPassword"
-          type="password"
-          placeholder="Confirm your password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          disabled={isLoading}
-          className="bg-input"
-        />
+        <div className="relative">
+          <Input
+            id="confirmPassword"
+            name="confirmPassword"
+            type={showConfirmPassword ? 'text' : 'password'}
+            placeholder="Confirm your password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            disabled={isLoading}
+            className="bg-input pr-16"
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword(prev => !prev)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+          >
+            {showConfirmPassword ? 'Hide' : 'Show'}
+          </button>
+        </div>
       </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}

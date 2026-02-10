@@ -39,13 +39,13 @@ export default function HomePage() {
 
               <RideBooking />
 
-              {/* Map Placeholder */}
-              <Card className="w-full h-96 bg-gradient-to-br from-muted to-muted/50 border border-border flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-4xl mb-2">🗺️</div>
-                  <p className="text-muted-foreground">Map View</p>
-                  <p className="text-xs text-muted-foreground mt-1">Enter a destination to see the map</p>
-                </div>
+              {/* Map Preview */}
+              <Card className="w-full h-96 border border-border overflow-hidden">
+                <img
+                  src="/addis-map.png"
+                  alt="Map preview of Addis Ababa"
+                  className="h-full w-full object-cover"
+                />
               </Card>
             </div>
           </div>

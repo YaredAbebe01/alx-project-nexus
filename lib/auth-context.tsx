@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       id: Math.random().toString(36).substr(2, 9),
       email,
       name: email.split('@')[0],
-      phone: '+1 (555) 123-4567',
+      phone: '+251936092577',
       profileImage: undefined,
     }
 

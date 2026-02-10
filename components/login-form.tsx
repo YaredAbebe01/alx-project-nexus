@@ -16,6 +16,7 @@ export function LoginForm() {
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -45,7 +46,7 @@ export function LoginForm() {
         <Input
           id="email"
           type="email"
-          placeholder="you@example.com"
+          placeholder="yourEmail@gmail.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={isLoading}
@@ -55,15 +56,24 @@ export function LoginForm() {
 
       <div className="space-y-2">
         <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={isLoading}
-          className="bg-input"
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            className="bg-input pr-16"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(prev => !prev)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+        </div>
       </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}

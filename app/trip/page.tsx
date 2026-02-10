@@ -10,7 +10,7 @@ import { MapPin, User, Star, Clock, Phone, MessageSquare, X } from 'lucide-react
 
 const MOCK_DRIVERS = {
   economy: {
-    name: 'Marcus Johnson',
+    name: 'Abel Tesfaye',
     rating: 4.9,
     rides: 2847,
     image: '👨',
@@ -19,7 +19,7 @@ const MOCK_DRIVERS = {
     eta: 5,
   },
   comfort: {
-    name: 'Sarah Williams',
+    name: 'Sarah Kebede',
     rating: 4.95,
     rides: 3200,
     image: '👩',
@@ -28,7 +28,7 @@ const MOCK_DRIVERS = {
     eta: 4,
   },
   xl: {
-    name: 'James Chen',
+    name: 'Yared Abebe',
     rating: 4.88,
     rides: 5100,
     image: '👨',
@@ -42,8 +42,7 @@ export default function TripPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { isAuthenticated, user } = useAuth()
-  const [status, setStatus] = useState<'confirming' | 'searching' | 'assigned' | 'arrived'>('confirming')
-  const [timer, setTimer] = useState(0)
+  const [status, setStatus] = useState<'confirming' | 'searching' | 'selecting' | 'assigned' | 'arrived'>('confirming')
 
   const ride = searchParams.get('ride') || 'economy'
   const price = searchParams.get('price') || '15.00'
@@ -59,25 +58,30 @@ export default function TripPage() {
   }, [isAuthenticated, router])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer(prev => {
-        if (prev >= 2) {
-          setStatus('searching')
-          return prev
-        }
-        return prev + 1
-      })
-    }, 1000)
+    const confirmTimer = setTimeout(() => {
+      setStatus('searching')
+    }, 2000)
 
-    return () => clearInterval(interval)
+    return () => clearTimeout(confirmTimer)
   }, [])
 
   useEffect(() => {
     if (status === 'searching') {
-      const assignInterval = setInterval(() => {
-        setStatus('assigned')
+      const searchTimer = setTimeout(() => {
+        setStatus('selecting')
       }, 3000)
-      return () => clearInterval(assignInterval)
+
+      return () => clearTimeout(searchTimer)
+    }
+  }, [status])
+
+  useEffect(() => {
+    if (status === 'assigned') {
+      const arriveTimer = setTimeout(() => {
+        setStatus('arrived')
+      }, 5000)
+
+      return () => clearTimeout(arriveTimer)
     }
   }, [status])
 
@@ -87,6 +91,10 @@ export default function TripPage() {
 
   const handleComplete = () => {
     router.push('/trips')
+  }
+
+  const handleChooseDriver = () => {
+    setStatus('assigned')
   }
 
   if (!isAuthenticated) {
@@ -101,11 +109,11 @@ export default function TripPage() {
         {/* Status Indicator */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
-            {['confirming', 'searching', 'assigned', 'arrived'].map((s, i) => (
+            {['confirming', 'searching', 'selecting', 'assigned', 'arrived'].map((s, i) => (
               <div
                 key={s}
                 className={`flex-1 h-1 rounded-full transition-colors ${
-                  ['confirming', 'searching', 'assigned', 'arrived'].indexOf(status) >= i
+                  ['confirming', 'searching', 'selecting', 'assigned', 'arrived'].indexOf(status) >= i
                     ? 'bg-secondary'
                     : 'bg-border'
                 }`}
@@ -115,6 +123,7 @@ export default function TripPage() {
           <p className="text-sm text-muted-foreground capitalize">
             {status === 'confirming' && 'Confirming your ride...'}
             {status === 'searching' && 'Finding the best driver for you...'}
+            {status === 'selecting' && 'Driver found. Choose to continue.'}
             {status === 'assigned' && 'Driver is on the way!'}
             {status === 'arrived' && 'Driver has arrived'}
           </p>
@@ -125,11 +134,12 @@ export default function TripPage() {
           {/* Trip Details */}
           <div className="md:col-span-2 space-y-4">
             {/* Map Area */}
-            <Card className="w-full h-64 bg-gradient-to-br from-muted to-muted/50 border border-border flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-4xl mb-2">🗺️</div>
-                <p className="text-muted-foreground">Live Map View</p>
-              </div>
+            <Card className="w-full h-64 border border-border overflow-hidden">
+              <img
+                src="/addis-map.png"
+                alt="Map preview of Addis Ababa"
+                className="h-full w-full object-cover"
+              />
             </Card>
 
             {/* Route Info */}
@@ -177,7 +187,7 @@ export default function TripPage() {
 
           {/* Driver Card */}
           <div>
-            {status === 'assigned' ? (
+            {status === 'selecting' || status === 'assigned' || status === 'arrived' ? (
               <Card className="p-4 border border-border space-y-4">
                 <div className="text-center">
                   <p className="text-2xl mb-2">{driver.image}</p>
@@ -214,23 +224,44 @@ export default function TripPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1 bg-transparent">
-                    <Phone className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="outline" className="flex-1 bg-transparent">
-                    <MessageSquare className="w-4 h-4" />
-                  </Button>
-                </div>
+                {status === 'selecting' ? (
+                  <div className="space-y-2">
+                    <Button
+                      onClick={handleChooseDriver}
+                      className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold"
+                    >
+                      Choose Driver
+                    </Button>
+                    <Button
+                      onClick={handleCancel}
+                      variant="outline"
+                      className="w-full border-red-500 text-red-500 hover:bg-red-50 bg-transparent"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel Ride
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" className="flex-1 bg-transparent">
+                        <Phone className="w-4 h-4" />
+                      </Button>
+                      <Button size="sm" variant="outline" className="flex-1 bg-transparent">
+                        <MessageSquare className="w-4 h-4" />
+                      </Button>
+                    </div>
 
-                <Button
-                  onClick={handleCancel}
-                  variant="outline"
-                  className="w-full border-red-500 text-red-500 hover:bg-red-50 bg-transparent"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Cancel Ride
-                </Button>
+                    <Button
+                      onClick={handleCancel}
+                      variant="outline"
+                      className="w-full border-red-500 text-red-500 hover:bg-red-50 bg-transparent"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel Ride
+                    </Button>
+                  </>
+                )}
               </Card>
             ) : (
               <Card className="p-4 border border-border">
